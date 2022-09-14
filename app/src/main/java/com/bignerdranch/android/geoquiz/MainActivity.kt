@@ -27,7 +27,12 @@ class MainActivity : AppCompatActivity() {
         Question(R.string.question_africa, false),
         Question(R.string.question_americas, true),
         Question(R.string.question_asia, true))
+
+    // 6 values for 6 questions
+    private val answeredArray = arrayOf(false, false, false, false, false, false)
     private var currentIndex = 0
+    private var numberCorrect = 0
+    private var questionCounter = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,12 +48,30 @@ class MainActivity : AppCompatActivity() {
 
         trueButton.setOnClickListener { view: View ->
             // Do something in response to the click here
-            checkAnswer(true)
+            if(!answeredArray[currentIndex]) {
+                checkAnswer(true)
+                answeredArray[currentIndex] = true
+                if(questionCounter == 6) {
+                    gradeQuiz()
+                }
+            }
+            else {
+                answeredQuestion()
+            }
         }
 
         falseButton.setOnClickListener { view: View ->
             // Do something in response to the click here
-            checkAnswer(false)
+            if(!answeredArray[currentIndex]) {
+                checkAnswer(false)
+                answeredArray[currentIndex] = true
+                if(questionCounter == 6) {
+                    gradeQuiz()
+                }
+            }
+            else {
+                answeredQuestion()
+            }
         }
 
         nextButton.setOnClickListener {
@@ -105,6 +128,25 @@ class MainActivity : AppCompatActivity() {
         }
         val toast = Toast.makeText(this, messageResId, Toast.LENGTH_SHORT)
         toast.setGravity(Gravity.TOP, 0, 0)
+        toast.show()
+
+        if (userAnswer == correctAnswer) {
+            numberCorrect++
+        }
+        questionCounter++
+    }
+
+    private fun answeredQuestion() {
+        val toast = Toast.makeText(this, R.string.answered_question, Toast.LENGTH_SHORT)
+        toast.setGravity(Gravity.TOP, 0, 0)
+        toast.show()
+    }
+
+    private fun gradeQuiz() {
+        val gradedQuiz = (numberCorrect * 100) / 6
+        var gradedString = "Result: " + gradedQuiz + "%"
+        val toast = Toast.makeText(this, gradedString, Toast.LENGTH_LONG)
+        toast.setGravity(Gravity.CENTER, 0, 0)
         toast.show()
     }
 
