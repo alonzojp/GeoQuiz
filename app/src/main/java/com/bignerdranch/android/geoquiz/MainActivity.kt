@@ -9,10 +9,16 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 
 private const val TAG = "MainActivity"
-
+private const val KEY_INDEX = "index"
 class MainActivity : AppCompatActivity() {
+
+    private val quizViewModel: QuizViewModel by lazy {
+        ViewModelProviders.of(this).get(QuizViewModel::class.java)
+    }
 
     private lateinit var trueButton: Button
     private lateinit var falseButton: Button
@@ -20,24 +26,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var previousButton: ImageButton
     private lateinit var questionTextView: TextView
 
-    private val questionBank = listOf(
-        Question(R.string.question_australia, true),
-        Question(R.string.question_oceans, true),
-        Question(R.string.question_mideast, false),
-        Question(R.string.question_africa, false),
-        Question(R.string.question_americas, true),
-        Question(R.string.question_asia, true))
 
-    // 6 values for 6 questions
-    private val answeredArray = arrayOf(false, false, false, false, false, false)
-    private var currentIndex = 0
-    private var numberCorrect = 0
-    private var questionCounter = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate(Bundle?) called")
         setContentView(R.layout.activity_main)
+
+        val currentIndex = savedInstanceState?.getInt(KEY_INDEX, 0) ?: 0
+        quizViewModel.currentIndex = currentIndex
 
         trueButton = findViewById(R.id.true_button)
         falseButton = findViewById(R.id.false_button)
@@ -48,10 +45,10 @@ class MainActivity : AppCompatActivity() {
 
         trueButton.setOnClickListener { view: View ->
             // Do something in response to the click here
-            if(!answeredArray[currentIndex]) {
+            if(!quizViewModel.checkIfAnswered()) {
                 checkAnswer(true)
-                answeredArray[currentIndex] = true
-                if(questionCounter == 6) {
+                quizViewModel.updateAnswered()
+                if(quizViewModel.getQuestionCounter() == 6) {
                     gradeQuiz()
                 }
             }
@@ -62,10 +59,10 @@ class MainActivity : AppCompatActivity() {
 
         falseButton.setOnClickListener { view: View ->
             // Do something in response to the click here
-            if(!answeredArray[currentIndex]) {
+            if(!quizViewModel.checkIfAnswered()) {
                 checkAnswer(false)
-                answeredArray[currentIndex] = true
-                if(questionCounter == 6) {
+                quizViewModel.updateAnswered()
+                if(quizViewModel.getQuestionCounter() == 6) {
                     gradeQuiz()
                 }
             }
@@ -75,17 +72,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         nextButton.setOnClickListener {
-            currentIndex = (currentIndex + 1) % questionBank.size
+            quizViewModel.moveToNext()
             updateQuestion()
         }
 
         previousButton.setOnClickListener {
-            currentIndex = (currentIndex + 5) % questionBank.size
+            quizViewModel.moveToPrevious()
             updateQuestion()
         }
 
         questionTextView.setOnClickListener {
-            currentIndex = (currentIndex + 1) % questionBank.size
+            quizViewModel.clickOnQuestion()
             updateQuestion()
         }
 
@@ -105,6 +102,13 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
         Log.d(TAG, "onPause() called")
     }
+
+    override fun onSaveInstanceState(savedInstanceState: Bundle) {
+        super.onSaveInstanceState(savedInstanceState)
+        Log.i(TAG, "onSaveInstanceState")
+        savedInstanceState.putInt(KEY_INDEX, quizViewModel.currentIndex)
+    }
+
     override fun onStop() {
         super.onStop()
         Log.d(TAG, "onStop() called")
@@ -115,12 +119,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateQuestion() {
-        val questionTextResId = questionBank[currentIndex].textResId
+        val questionTextResId = quizViewModel.currentQuestionText
         questionTextView.setText(questionTextResId)
     } // end updateQuestion
 
     private fun checkAnswer(userAnswer: Boolean) {
-        val correctAnswer = questionBank[currentIndex].answer
+        val correctAnswer = quizViewModel.currentQuestionAnswer
         val messageResId = if (userAnswer == correctAnswer) {
             R.string.correct_toast
         } else {
@@ -131,9 +135,9 @@ class MainActivity : AppCompatActivity() {
         toast.show()
 
         if (userAnswer == correctAnswer) {
-            numberCorrect++
+            quizViewModel.increaseNumberCorrect()
         }
-        questionCounter++
+        quizViewModel.increaseQuestionCounter()
     }
 
     private fun answeredQuestion() {
@@ -143,9 +147,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun gradeQuiz() {
-        val gradedQuiz = (numberCorrect * 100) / 6
-        var gradedString = "Result: " + gradedQuiz + "%"
-        val toast = Toast.makeText(this, gradedString, Toast.LENGTH_LONG)
+        val toast = Toast.makeText(this, quizViewModel.createGradedString(), Toast.LENGTH_LONG)
         toast.setGravity(Gravity.CENTER, 0, 0)
         toast.show()
     }
