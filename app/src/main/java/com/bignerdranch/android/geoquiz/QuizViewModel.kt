@@ -1,5 +1,6 @@
 package com.bignerdranch.android.geoquiz
 
+import android.content.Intent
 import androidx.lifecycle.ViewModel
 
 private const val TAG = "QuizViewModel"
@@ -7,6 +8,7 @@ class QuizViewModel : ViewModel() {
 
     var currentIndex = 0
     var isCheater = false
+    private val isCheaterArray = arrayOf(false, false, false, false, false, false)
 
     private val questionBank = listOf(
         Question(R.string.question_australia, true),
@@ -59,4 +61,13 @@ class QuizViewModel : ViewModel() {
         return "Result: " + gradedQuiz + "%"
     }
 
+    fun reportCheater(data: Intent?) {
+        isCheaterArray[currentIndex] =
+            data?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false) ?: false
+    }
+
+    fun checkCheater(): Boolean {
+        return isCheaterArray[currentIndex]
+
+    }
 }
