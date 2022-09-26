@@ -59,6 +59,12 @@
             android:layout_gravity="bottom|end"
             android:src="@drawable/arrow_left"
             android:contentDescription = "Previous Button"/>
+        <Button
+            android:id="@+id/cheat_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/cheat_button" />
         <ImageButton
             android:id="@+id/next_button"
             android:layout_width="wrap_content"

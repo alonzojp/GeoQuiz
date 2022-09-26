@@ -4,7 +4,9 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/Jacob/AndroidStudioProjects/GeoQuiz/app/src/main/res/layout-land/activity_main.xml" value="0.15828924162257496" />
-        <entry key="..\:/Users/Jacob/AndroidStudioProjects/GeoQuiz/app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="..\:/Users/Jacob/AndroidStudioProjects/GeoQuiz/app/src/main/res/layout/activity_cheat.xml" value="0.1911231884057971" />
+        <entry key="..\:/Users/Jacob/AndroidStudioProjects/GeoQuiz/app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="..\:/Users/Jacob/AndroidStudioProjects/GeoQuiz/app/src/main/res/layout/activity_main2.xml" value="0.17831813576494426" />
       </map>
     </option>
   </component>
